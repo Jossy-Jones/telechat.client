@@ -6,15 +6,13 @@
                     <h1 class="_title">Telechat</h1>
                     <p class="font-semibold text-gray-500">Sign in to your account</p>
                 </div>
-                <form>
-                    <div class="form-group">
-                        <input type="text" name="username" id="username" placeholder="Username">
-                    </div>
-                    <div class="form-group">
-                        <input type="text" name="username" id="username" placeholder="Password">
-                    </div>
+                <form id="sign_in" @submit="submitForm" novalidate>
+                    <app-input :name="'username'" :placeholder="'Username'" v-model:inputValue="user.username" :inputError="errors.username"></app-input>
+
+                    <app-input :name="'password'" :type="'text'" :placeholder="'Password'" v-model:inputValue="user.password" :inputError="errors.password"></app-input>
+
                     <div>
-                        <button class="btn">Sign in</button>
+                        <app-button class="mx-auto" :loading="processing">Sign in</app-button>
                     </div>
                 </form>
                 <div>
@@ -26,7 +24,68 @@
 </template>
 
 <script>
+import {mapActions} from "vuex"
+import { toast } from "vue3-toastify";
+import {validator} from '../utils/formValidator.js';
+
 export default {
+    name: "SignIn",
+    data(){
+        return {
+            user: {
+                username: "",
+                password: "",
+            },
+            errors: {
+                username: null,
+                password: null,
+            },
+            processing: false,
+            
+        }
+    },
+    methods: {
+        ...mapActions({
+            sign_in: "auth/signIn",
+        }),
+        async submitForm(evt){
+            evt.preventDefault();
+
+            const errors = validator.validateForm("sign_in");
+
+            if(errors.length > 0){
+                this.errors = {
+                    username: validator.getErrorByKey(errors, "username"),
+                    password: validator.getErrorByKey(errors, "password")
+                }
+            } else {
+                this.processing = true;
+                const response = await this.sign_in(this.user);
+                console.log(response)
+                if(response.succeeded){
+                    this.$router.push("/")
+                } else {
+                    this.processing = false;
+                    toast.error(response.message)
+                }
+                
+            }
+
+        }
+    },
+    watch: {
+        'user.username'(newValue){
+            if(newValue){
+                this.errors.username = null;
+            }
+        },
+        'user.password'(newValue){
+            if(newValue){
+                this.errors.password = null;
+            }
+        }
+    }
+
 
 }
 </script>
@@ -54,18 +113,6 @@ export default {
 
 .form-container form{
     @apply grid gap-4;
-}
-
-.form-group{
-    @apply block px-4 py-2 border-2 border-gray-300 focus-within:border-primaryColor rounded;
-}
-
-.form-group input{
-    @apply w-full outline-none bg-transparent
-}
-
-.btn{
-    @apply inline-block px-6 py-1 text-white font-semibold bg-primaryColor border-primaryColor rounded-md
 }
 
 .linkText{

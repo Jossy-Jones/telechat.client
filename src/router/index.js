@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { Authenticated } from "./auth";
 
 const router = createRouter({
     history: createWebHistory("/"),
@@ -25,6 +26,8 @@ const router = createRouter({
     scrollBehavior: (to, from, savedPosition)=>{
         return (savedPosition ? savedPosition : {top: 0});
     }
-})
+});
+
+router.beforeEach(Authenticated);
 
 export default router;

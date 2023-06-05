@@ -1,5 +1,5 @@
 <template>
-    <div class="relative grid  bg-slate-900 h-screen">
+    <div class="chat-view">
         <div class="_header">
             <div class="wrapper">
                 <div class="user-info">
@@ -90,9 +90,10 @@
                     <attachment-icon :size="20" />
                 </label>
                 <input type="file" name="file" id="fileButton" hidden>
-                <input type="text" name="" id="" placeholder="Type your message here" class="chat-entry">
+                <chat-input v-model:inputValue="message"/>
                 <label for="" class="entry-icons">
-                    <microphone-icon :size="20" />
+                    <send-icon :size="20" v-if="entry"/>
+                    <microphone-icon :size="20" v-else />
                 </label>
             </div>
         </div>
@@ -100,18 +101,47 @@
 </template>
 
 <script>
-import AttachmentIcon from './icons/attachment-icon.vue';
-import MicrophoneIcon from './icons/microphone-icon.vue';
-import CheckIcon from './icons/check-icon.vue';
-import ContextmenuIcon from './icons/contextmenu-icon.vue';
-
+import socket from "../../services/eventService.js";
+import ChatInput from "./ChatInput.vue";
+import CheckIcon from '../icons/check-icon.vue';
+import ContextmenuIcon from '../icons/contextmenu-icon.vue';
+import AttachmentIcon from '../icons/attachment-icon.vue';
+import MicrophoneIcon from '../icons/microphone-icon.vue';
+import SendIcon from '../icons/send-icon.vue';
 
 export default {
-    components: {AttachmentIcon, MicrophoneIcon, CheckIcon, ContextmenuIcon}
+    components: {CheckIcon, ContextmenuIcon, AttachmentIcon, MicrophoneIcon, SendIcon, ChatInput},
+    data(){
+        return {
+            message: "",
+            entry: false,
+            typing: false,
+        }
+    },
+    methods: {
+        sendMessage(){
+            socket.emit("chat:outbound", {
+                message
+            })
+        }
+    },
+    watch: {
+        'message'(newValue){
+            if(newValue){
+                return (newValue.length > 0) ? (this.entry = true) : (this.entry = false);
+            } else {
+                return (this.message.length > 0) ? (this.entry = true) : (this.entry = false);
+            }
+        }
+    }
 }
 </script>
 
 <style scoped>
+.chat-view{
+    @apply relative grid grid-rows-[min-content_1fr_min-content] h-full bg-slate-900 overflow-hidden
+}
+
 ._header{
     @apply relative w-full place-self-start;
 }
@@ -180,7 +210,4 @@ export default {
     @apply inline-flex justify-center w-10 text-gray-500 cursor-pointer;
 }
 
-.chat-entry{
-    @apply p-2 w-full outline-0 focus:outline-none bg-gray-200 rounded-md;
-}
 </style>

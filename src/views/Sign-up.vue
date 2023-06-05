@@ -6,18 +6,15 @@
                     <h1 class="_title">Telechat</h1>
                     <p class="font-semibold text-gray-500">Create your account</p>
                 </div>
-                <form>
-                    <div class="form-group">
-                        <input type="text" name="fullname" id="fullname" placeholder="Fullname">
-                    </div>
-                    <div class="form-group">
-                        <input type="text" name="username" id="username" placeholder="Username">
-                    </div>
-                    <div class="form-group">
-                        <input type="text" name="username" id="username" placeholder="Password">
-                    </div>
+                <form id="sign_up" @submit="submitForm" novalidate>
+                    <app-input :name="'fullname'" :placeholder="'Fullname'" v-model:inputValue="user.fullname" :inputError="errors.fullname"></app-input>
+
+                    <app-input :name="'username'" :placeholder="'Username'" v-model:inputValue="user.username" :inputError="errors.username"></app-input>
+
+                    <app-input :name="'password'" :type="'text'" :placeholder="'Password'" v-model:inputValue="user.password" :inputError="errors.password"></app-input>
+
                     <div>
-                        <button class="btn">Create account</button>
+                        <app-button class="mx-auto" :loading="processing">Create account</app-button>
                     </div>
                 </form>
                 <div>
@@ -29,6 +26,10 @@
 </template>
 
 <script>
+import {mapActions} from "vuex"
+import { toast } from "vue3-toastify";
+import {validator} from '../utils/formValidator.js';
+
 export default {
     name: "SignUp",
     data(){
@@ -44,7 +45,52 @@ export default {
                 password: null,
             },
             processing: false,
-            
+        }
+    },
+    methods: {
+        ...mapActions({
+            sign_up: "auth/signUp",
+        }),
+        submitForm(evt){
+            evt.preventDefault();
+
+            const errors = validator.validateForm("sign_up");
+
+            if(errors.length > 0){
+                this.errors = {
+                    fullname: validator.getErrorByKey(errors, "fullname"),
+                    username: validator.getErrorByKey(errors, "username"),
+                    password: validator.getErrorByKey(errors, "password")
+                }
+            } else {
+                // this.processing = true;
+                toast.success("Hello there");
+                // this.sign_up(this.user).then(data=>{
+                //     if(data.success){
+                //         this.$route()
+                //     } else {
+                //     }
+                //     this.processing = false
+                // })
+            }
+
+        }
+    },
+    watch: {
+        'user.fullname'(newValue){
+            if(newValue){
+                this.errors.fullname = null;
+            }
+        },
+        'user.username'(newValue){
+            if(newValue){
+                this.errors.username = null;
+            }
+        },
+        'user.password'(newValue){
+            if(newValue){
+                this.errors.password = null;
+            }
         }
     }
 
@@ -82,10 +128,6 @@ export default {
 
 .form-group input{
     @apply w-full outline-none bg-transparent
-}
-
-.btn{
-    @apply inline-block px-6 py-1 text-white font-semibold bg-primaryColor border-primaryColor rounded-md
 }
 
 .linkText{

@@ -77,7 +77,7 @@
 </template>
 
 <script setup>
-import searchIcon from "./icons/search-icon.vue"
+import searchIcon from "../icons/search-icon.vue"
 </script>
 
 <style scoped>
@@ -86,6 +86,10 @@ import searchIcon from "./icons/search-icon.vue"
 }
 .app-search{
     @apply flex py-2 px-3 gap-1 items-center text-sm border rounded-xl focus-within:border-primaryColor;
+}
+
+.app-search input{
+    @apply bg-transparent w-full
 }
 
 ._list{

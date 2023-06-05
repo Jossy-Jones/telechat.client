@@ -10,6 +10,7 @@ export default {
         primaryColor: "#3b82f6",
         secondaryColor: "#dbeafe",
         primaryBg: "",
+        textColor: "#000000",
       }
     },
   },

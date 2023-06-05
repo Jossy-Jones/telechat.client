@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components{
+    body{
+        @apply bg-white text-textColor;
+    }
+
+    #app{
+        @apply h-auto 2xl:p-4 2xl:h-screen
+    }
+}
